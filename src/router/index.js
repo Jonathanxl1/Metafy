@@ -3,7 +3,8 @@ import VueRouter from "vue-router";
 import App from "@/App.vue";
 import Add from "@/views/Add.vue";
 import Base from "@/views/Base.vue";
-
+import DetailsGoal from "@/views/DetailsGoal";
+import Edit from "@/views/Edit";
 
 Vue.use(VueRouter);
 
@@ -12,15 +13,28 @@ const routes = [
     path: "/",
     name: "App",
     component: App
-  },{
+  },
+  {
     path: "/add",
     name: "add",
     component: Add
   },
   {
-    path:"/base",
-    name:"base",
-    component:Base
+    path: "/base",
+    name: "base",
+    component: Base
+  },
+  {
+    path: "/meta/:id",
+    name: "DetailsGoal",
+    component: DetailsGoal,
+    
+    
+  },
+  {
+    path: "/meta/:id/edit",
+    name:"Edit",
+    component: Edit
   }
   // {
   //   // path: "/about",

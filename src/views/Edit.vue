@@ -115,12 +115,12 @@
 
           <v-row class="mt-5" justify="center">
             <v-btn
-              @click="addGoal"
+              @click="updateGoal()"
               :x-large="true"
               :disabled="!valid"
               class="addGoal"
               color="success"
-              >Agregar</v-btn
+              >Actualizar</v-btn
             >
           </v-row>
         </v-form>
@@ -137,6 +137,7 @@ export default {
   props: ["time"],
   data() {
     return {
+      id: this.$route.params.id,
       process: "",
       valid: false,
       rulesTitle: [
@@ -153,6 +154,8 @@ export default {
       ruleSelect: [value => !!value || "Select an Option"],
       date: this.actually(),
       menu2: false,
+      update:null,
+      error:null,
       step: "",
       state: {
         title: "",
@@ -191,13 +194,14 @@ export default {
   },
   mounted() {
     this.state.currentdate = this.currentdate();
+    this.goal();
     console.log(this.$store.state.goals);
     console.log(this.$refs.form);
   },
   watch: {
-    process: function(val) {
-      if (val == "complete") {
-        this.$refs.form.reset();
+    update: function(val) {
+      if (val && val !== null) {
+        this.$router.go(-1)
       }
     },
     "state.steps.active": function(val) {
@@ -218,13 +222,24 @@ export default {
     }
   },
   methods: {
-    addGoal() {
-      db.addGoal(this.state)
+    goal: function() {
+      let id = this.id;
+      db.retriveGoal(id)
         .then(data => {
-          this.process = data;
+          this.state = Object.assign({}, this.state, data);
+          console.info(data);
         })
         .catch(error => {
-          this.process = error;
+          console.error(error);
+        });
+    },
+    updateGoal: function() {
+      db.updateGoal(this.state, this.id)
+        .then(data => {
+          this.update = data;
+        })
+        .catch(error => {
+          this.error = error;
         });
     },
     validList() {
