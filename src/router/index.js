@@ -1,40 +1,39 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import App from "@/App.vue";
+// import App from "@/App.vue";
 import Add from "@/views/Add.vue";
 import Base from "@/views/Base.vue";
 import DetailsGoal from "@/views/DetailsGoal";
 import Edit from "@/views/Edit";
+import Config from "@/views/Config";
 
 Vue.use(VueRouter);
 
 const routes = [
-  {
-    path: "/",
-    name: "App",
-    component: App
-  },
   {
     path: "/add",
     name: "add",
     component: Add
   },
   {
-    path: "/base",
+    path: "/",
     name: "base",
     component: Base
   },
   {
     path: "/meta/:id",
     name: "DetailsGoal",
-    component: DetailsGoal,
-    
-    
+    component: DetailsGoal
   },
   {
     path: "/meta/:id/edit",
-    name:"Edit",
+    name: "Edit",
     component: Edit
+  },
+  {
+    path: "/config",
+    name: "Config",
+    component: Config
   }
   // {
   //   // path: "/about",

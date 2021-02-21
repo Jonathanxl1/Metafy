@@ -1,8 +1,8 @@
 <template>
   <div>
-     <v-carousel :light="true"  :hide-delimiter-background="true" :hide-delimiter="true" :hide-delimiters="true" >
+     <v-carousel :light="true"  :hide-delimiter-background="true" :hide-delimiter="true" :hide-delimiters="true" :show-arrows="Object.keys(state).length > 1 " >
       <v-carousel-item v-for="(goal,i) in state" :key="i"> 
-        <viewGoal :state="goal" :id="Number(i)"></viewGoal>
+        <viewGoal :state="goal" :id="Number(i)" :timer="Number(now)" ></viewGoal>
       </v-carousel-item>
     </v-carousel> 
     
@@ -19,18 +19,27 @@ export default {
   components: { viewGoal },
   data() {
     return {
-      state: {}
+      state: {},
+      now:"",
     };
   },
   created() {
     db.retriveGoals()
       .then(data => {
         this.state = data;
-        console.info(data);
+        console.info(Object.keys(this.state).length);
       })
       .catch(error => {
         console.error(error);
       });
+      this.timer();
+  },
+  methods:{
+    timer:function(){
+      setInterval(()=>{
+        this.now = new Date(Date.now()).getTime();
+      },1000)
+    }
   }
 };
 </script>

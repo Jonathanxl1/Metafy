@@ -3,6 +3,10 @@
     <v-row justify="center">
       <v-col cols="9" lg="9" md="8" sm="9">
         <v-form v-model="valid" ref="form">
+          <v-row justify="center">
+            <v-switch label="Reiniciar desde cero" v-model="reboot"> </v-switch>
+            <div v-if="!reboot" class="text-center justify-center mt-5 ml-2">Fecha de Inicio: {{this.state.currentdate}}</div>
+          </v-row>
           <v-row>
             <v-text-field
               color="green"
@@ -50,7 +54,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-text-field
-                v-model="state.datetime"
+                v-model="state.date"
                 label="Custom Date"
                 prepend-icon="event"
                 readonly
@@ -58,11 +62,40 @@
               ></v-text-field>
             </template>
             <v-date-picker
-              v-model="state.datetime"
+              v-model="state.date"
               @input="menu2 = false"
               color="green"
-              :min="new Date().toISOString().substr(0, 10)"
+              :min="this.actually()"
             ></v-date-picker>
+          </v-menu>
+          <v-menu
+            ref="time"
+            v-if="state.value == 4"
+            v-model="menu3"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            :return-value.sync="state.time"
+            offset-y
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="state.time"
+                label="Custom time"
+                prepend-icon="access_time"
+                v-bind="attrs"
+                readonly
+                v-on="on"
+                :rules="ruleDateTime"
+              ></v-text-field>
+            </template>
+            <v-time-picker
+              v-model="state.time"
+              color="green"
+              v-if="menu3"
+              @click:minute="$refs.time.save(state.time)"
+            ></v-time-picker>
           </v-menu>
 
           <v-switch label="Pasos" color="green" v-model="state.steps.active" />
@@ -133,12 +166,13 @@
 import db from "../store/localdata";
 
 export default {
-  name: "Add",
+  name: "Edit",
   props: ["time"],
   data() {
     return {
       id: this.$route.params.id,
       process: "",
+      reboot:false,
       valid: false,
       rulesTitle: [
         value => !!value || "Required",
@@ -152,17 +186,24 @@ export default {
       ],
       ruleStep: [() => this.validList() || "Add item to list"],
       ruleSelect: [value => !!value || "Select an Option"],
-      date: this.actually(),
+      ruleDateTime: [
+        v => !!v || "Required",
+        () => this.validDateTime() || "La hora ya paso"
+      ],
+      date: "",
       menu2: false,
-      update:null,
-      error:null,
+      menu3: false,
+      update: null,
+      error: null,
       step: "",
       state: {
         title: "",
         currentdate: "",
         description: "",
         value: "",
-        datetime: this.actually(),
+        time: "",
+        date: "",
+        datetime: "",
         steps: {
           active: false,
           values: []
@@ -201,7 +242,7 @@ export default {
   watch: {
     update: function(val) {
       if (val && val !== null) {
-        this.$router.go(-1)
+        this.$router.go(-1);
       }
     },
     "state.steps.active": function(val) {
@@ -209,16 +250,27 @@ export default {
         this.state.steps.values = [];
       }
     },
-    date: function(val) {
-      this.state.datetime = val;
-    },
+    // date: function(val) {
+    //   // this.state.datetime = val;
+    // },
     "state.value": function(v) {
       if (v != 4) {
         this.state.datetime = this.actually();
+        // Pendiente de configurar shot,long medium time
       }
     },
     "state.steps.values": function() {
       this.validList();
+    },
+    "state.time": function() {
+      if (this.state.value == 4) {
+        this.state.datetime = `${this.state.date} ${this.state.time}`;
+      }
+    },
+    "state.date": function() {
+      if (this.state.value == 4) {
+        this.state.datetime = `${this.state.date} ${this.state.time}`;
+      }
     }
   },
   methods: {
@@ -234,6 +286,9 @@ export default {
         });
     },
     updateGoal: function() {
+      if(this.reboot){
+        this.state.currentdate = this.currentdate();
+      }
       db.updateGoal(this.state, this.id)
         .then(data => {
           this.update = data;
@@ -256,19 +311,45 @@ export default {
     currentdate() {
       let date = new Date();
       let dateY = `${date.getFullYear()}-${date.getMonth() +
-        1}-${date.getUTCDate()}`;
+        1}-${date.getDate()}`;
       let dateT = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 
       return `${dateY} ${dateT}`;
     },
     actually() {
-      return new Date().toISOString().substr(0, 10);
+      let date = new Date();
+      let year = date.getFullYear();
+      let month;
+      if (Number(date.getMonth()) <= 9) {
+        month = String("0" + (date.getMonth() + 1));
+      } else {
+        month = String(date.getMonth() + 1);
+      }
+      let day;
+      if (Number(date.getDate()) <= 9) {
+        day = String("0" + date.getDate());
+      } else {
+        day = String(date.getDate());
+      }
+
+      let actually = `${year}-${month}-${day}`;
+      return String(actually);
     },
     validate() {
       this.$refs.form.validate();
     },
     remove: function(index) {
       this.state.steps.values.splice(index, 1);
+    },
+    validDateTime() {
+      let goal = new Date(this.state.datetime).getTime();
+      let now = new Date(Date.now()).getTime();
+
+      if (goal > now) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 };

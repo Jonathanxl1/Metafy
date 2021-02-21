@@ -12,8 +12,13 @@ function mountDb() {
     });
     goals.createIndex("by_title", "title");
     goals.createIndex("by_status", "status.value");
-    db.createObjectStore(config, { autoIncrement: true });
+    let conf = db.createObjectStore(config, { autoIncrement: true });
+    conf.createIndex("by_times", "time");
+    conf.put({ time: "short", period: 1, value: 3 });
+    conf.put({ time: "medium", period: 1, value: 6 });
+    conf.put({ time: "long", period: 2, value: 1 });
   };
+
   request.onsuccess = function(event) {
     let db = request.result;
     db.close();
@@ -21,6 +26,8 @@ function mountDb() {
   };
 
   request.onerror = function(event) {
+    let db = request.result;
+    db.close();
     console.error(event);
   };
 }
@@ -44,6 +51,7 @@ function addGoal(value) {
 
       tx.onerror = function(event) {
         console.error(event);
+        db.close();
         reject(event.type.toString());
       };
     };
@@ -58,15 +66,39 @@ function desmountDb() {
     let del = indexedDB.deleteDatabase(BASE);
     del.onsuccess = function(event) {
       console.info(event);
-      alert("hi");
+      // alert("hi");
     };
   }
+}
+
+function resetAll() {
+  return new Promise(function(resolve, reject) {
+    let request = indexedDB.open(BASE);
+    request.onsuccess = function() {
+      let db = request.result;
+      let tx = db.transaction("goals", "readwrite");
+      let goals = tx.objectStore("goals");
+      goals.clear();
+      let tx2 = db.transaction("config", "readwrite");
+      let config = tx2.objectStore("config");
+      config.delete(name);
+      tx.oncomplete = function() {
+        db.close();
+        resolve(true);
+      };
+
+      tx.onerror = function() {
+        db.close();
+        reject();
+      };
+    };
+  });
 }
 
 function retriveGoals() {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open("Metafy");
-      request.onsuccess = function() {
+    request.onsuccess = function() {
       let db = request.result;
       let tx = db.transaction("goals", "readwrite");
       let store = tx.objectStore("goals");
@@ -96,7 +128,6 @@ function retriveGoal(value) {
       let db = request.result;
       let tx = db.transaction("goals", "readwrite");
       let store = tx.objectStore("goals");
-      
 
       let data = store.get(Number(value));
       tx.oncomplete = function() {
@@ -105,13 +136,14 @@ function retriveGoal(value) {
       };
 
       tx.onerror = function(event) {
+        db.close();
         reject(event);
       };
     };
   });
 }
 
-function updateGoal(value,key) {
+function updateGoal(value, key) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onsuccess = function() {
@@ -119,7 +151,7 @@ function updateGoal(value,key) {
 
       let tx = db.transaction("goals", "readwrite");
       let store = tx.objectStore("goals");
-      store.put(value,Number(key));
+      store.put(value, Number(key));
 
       tx.oncomplete = function() {
         db.close();
@@ -162,5 +194,6 @@ export default {
   desmountDb,
   mountDb,
   retriveGoal,
-  retriveGoals
+  retriveGoals,
+  resetAll
 };

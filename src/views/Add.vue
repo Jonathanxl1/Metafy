@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-container >
     <v-row justify="center">
       <v-col cols="9" lg="9" md="8" sm="9">
-        <v-form v-model="valid" ref="form">
+        <v-form v-model="valid" ref="form" >
           <v-row>
             <v-text-field
               color="green"
@@ -50,7 +50,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-text-field
-                v-model="state.datetime"
+                v-model="state.date"
                 label="Custom Date"
                 prepend-icon="event"
                 readonly
@@ -58,11 +58,40 @@
               ></v-text-field>
             </template>
             <v-date-picker
-              v-model="state.datetime"
+              v-model="state.date"
               @input="menu2 = false"
               color="green"
-              :min="new Date().toISOString().substr(0, 10)"
+              :min="this.actually()"
             ></v-date-picker>
+          </v-menu>
+          <v-menu
+            ref="time"
+            v-if="state.value == 4"
+            v-model="menu3"
+            :close-on-content-click="false"
+            :nudge-right="40"
+            transition="scale-transition"
+            :return-value.sync="state.time"
+            offset-y
+            min-width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="state.time"
+                label="Custom time"
+                prepend-icon="access_time"
+                v-bind="attrs"
+                readonly
+                v-on="on"
+                :rules="ruleDateTime"
+              ></v-text-field>
+            </template>
+            <v-time-picker
+              v-model="state.time"
+              color="green"
+              v-if="menu3"
+              @click:minute="$refs.time.save(state.time)"
+            ></v-time-picker>
           </v-menu>
 
           <v-switch label="Pasos" color="green" v-model="state.steps.active" />
@@ -134,10 +163,10 @@ import db from "../store/localdata";
 
 export default {
   name: "Add",
-  props: ["time"],
   data() {
     return {
       process: "",
+      form: {},
       valid: false,
       rulesTitle: [
         value => !!value || "Required",
@@ -151,22 +180,30 @@ export default {
       ],
       ruleStep: [() => this.validList() || "Add item to list"],
       ruleSelect: [value => !!value || "Select an Option"],
-      date: this.actually(),
+      ruleDateTime: [
+        v => !!v || "Required",
+        () => this.validDateTime() || "La hora ya paso"
+      ],
+      date: this.currentdate(),
+      menu3: false,
       menu2: false,
       step: "",
+
       state: {
         title: "",
         currentdate: "",
         description: "",
         value: "",
-        datetime: this.actually(),
+        time: this.DailyTime(),
+        datetime: "",
+        date: this.actually(),
         steps: {
           active: false,
           values: []
         },
         status: {
           value: "active",
-          date: this.actually()
+          date: this.currentdate()
         }
       },
       options: [
@@ -192,12 +229,20 @@ export default {
   mounted() {
     this.state.currentdate = this.currentdate();
     console.log(this.$store.state.goals);
-    console.log(this.$refs.form);
+    console.log(this);
+    this.form=Object.assign({},this.state);
+    
   },
   watch: {
     process: function(val) {
       if (val == "complete") {
         this.$refs.form.reset();
+        this.state = Object.assign({},this.form);
+        this.date= this.currentdate();
+        this.process="";
+        this.$refs.form.resetValidation();
+        
+        // this.$forceUpdated();
       }
     },
     "state.steps.active": function(val) {
@@ -205,16 +250,28 @@ export default {
         this.state.steps.values = [];
       }
     },
-    date: function(val) {
-      this.state.datetime = val;
-    },
+    // date: function(val) {
+    //   this.state.datetime = val;
+    // },
     "state.value": function(v) {
       if (v != 4) {
         this.state.datetime = this.actually();
+      } else {
+        this.state.datetime = `${this.state.date} ${this.state.time}`;
       }
     },
     "state.steps.values": function() {
       this.validList();
+    },
+    "state.time": function() {
+      if (this.state.value == 4) {
+        this.state.datetime = `${this.state.date} ${this.state.time}`;
+      }
+    },
+    "state.date": function() {
+      if (this.state.value == 4) {
+        this.state.datetime = `${this.state.date} ${this.state.time}`;
+      }
     }
   },
   methods: {
@@ -227,11 +284,33 @@ export default {
           this.process = error;
         });
     },
+    DailyTime: function() {
+      let time = Number(new Date(Date.now()).toTimeString().slice(0, 2));
+      if (time>= 0 && time < 8) {
+        return "8:00";
+      } else if (time < 13) {
+        return "13:00";
+      } else if (time < 21) {
+        return "22:00";
+      } else {
+        return "23:59";
+      }
+    },
     validList() {
       if (this.state.steps.values.length <= 0) {
         return false;
       } else {
         return true;
+      }
+    },
+    validDateTime() {
+      let goal = new Date(this.state.datetime).getTime();
+      let now = new Date(Date.now()).getTime();
+
+      if (goal > now) {
+        return true;
+      } else {
+        return false;
       }
     },
     addSteps(value) {
@@ -241,13 +320,29 @@ export default {
     currentdate() {
       let date = new Date();
       let dateY = `${date.getFullYear()}-${date.getMonth() +
-        1}-${date.getUTCDate()}`;
+        1}-${date.getDate()}`;
       let dateT = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 
       return `${dateY} ${dateT}`;
     },
     actually() {
-      return new Date().toISOString().substr(0, 10);
+      let date = new Date();
+      let year = date.getFullYear();
+      let month;
+      if (Number(date.getMonth()) <= 9) {
+        month = String("0" + (date.getMonth() + 1));
+      } else {
+        month = String(date.getMonth() + 1);
+      };
+      let day;
+      if (Number(date.getDate()) <= 9) {
+        day = String("0" + (date.getDate()));
+      } else {
+        day = String(date.getDate() );
+      }
+
+      let actually = `${year}-${month}-${day}`;
+      return String(actually);
     },
     validate() {
       this.$refs.form.validate();
@@ -255,6 +350,9 @@ export default {
     remove: function(index) {
       this.state.steps.values.splice(index, 1);
     }
+  },
+  updated(){
+
   }
 };
 </script>

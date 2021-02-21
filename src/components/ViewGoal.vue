@@ -11,15 +11,20 @@
             :color="statusProgress(value)"
           >
             <v-btn
+              :to="'meta/' + id"
+              tile
               icon
-              color="red"
+              small
+              x-small
+              :color="statusProgress(value)"
               v-if="
                 this.$vuetify.breakpoint.md ||
                   this.$vuetify.breakpoint.sm ||
                   this.$vuetify.breakpoint.xs
               "
             >
-              <v-icon>create</v-icon>
+              <v-icon>visibility</v-icon>
+              <span>Ver</span>
             </v-btn>
           </v-progress-circular>
         </v-col>
@@ -36,9 +41,7 @@
         >
           {{ title }}
         </h1>
-        <router-link
-          class="d-none d-lg-flex  black--text"
-          :to="'meta/' + id"
+        <router-link class="d-none d-lg-flex  black--text" :to="'meta/' + id"
           ><h1 class="text-lg-h5 text-sm-h5 text-h5">
             {{ title }}
           </h1></router-link
@@ -58,17 +61,21 @@ export default {
       type: Object
     },
     id: {
+      type: Number
+    },
+    timer:{
       type:Number
     }
+
   },
   components: {},
   mounted() {
     console.log(this.$vuetify.breakpoint);
-    this.diffDates();
+    
   },
   data() {
     return {
-      value: 10,
+      value: 0,
       goal: this.state,
       
     };
@@ -86,16 +93,22 @@ export default {
 
   methods: {
     diffDates() {
-      let start = new Date(this.goal.currentdate.toString());
-      let goal = new Date(this.goal.datetime);
-      let diffCurrent = Math.ceil(Math.abs(goal - Date.now()) / 86400000);
-      let diffDates = Math.ceil(Math.abs(goal - start) / 86400000);
+      let start = new Date(this.goal.currentdate.toString()).getTime();
+      let goal = new Date(this.goal.datetime).getTime();
+      let now = this.timer;
+      if (now > goal) {
+        this.value = 0;
+      } else {
+        let diffCurrent = Math.ceil(Math.abs(goal - now) );
+        let diffDates = Math.ceil(Math.abs(goal - start));
 
-      let total = (diffCurrent * 100) / diffDates;
-      this.value = total;
+        let total = (diffCurrent * 100) / diffDates;
+        this.value = total;
+      console.log(this.value,diffCurrent,diffDates);
+
+      }
 
       // Math.ceil(diffCurrent/86400000)
-      console.log(total);
     },
     statusProgress(value) {
       if (value > 80 && value < 101) {
@@ -105,6 +118,12 @@ export default {
       } else {
         return "red";
       }
+    }
+  },
+  watch:{
+    "timer":function(){
+      this.diffDates();
+
     }
   }
 };
