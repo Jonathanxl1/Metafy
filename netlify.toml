@@ -9,3 +9,17 @@
     to="/"
     status= 200
     force = true
+
+[[redirects]]
+    from="/meta/*"
+    to="/"
+    status= 200
+    query={id:id}
+    force = true
+
+[[redirects]]
+    from="/meta/*/edit"
+    to="/"
+    status= 200
+    query={id:id}
+    force = true
