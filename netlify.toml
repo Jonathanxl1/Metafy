@@ -1,5 +1,11 @@
 [[redirects]]
-    from="/*"
+    from="/add"
+    to="/"
+    status= 200
+    force = true
+
+[[redirects]]
+    from="/config"
     to="/"
     status= 200
     force = true
