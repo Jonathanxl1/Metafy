@@ -1,8 +1,8 @@
 <template>
-  <v-container >
+  <v-container>
     <v-row justify="center">
       <v-col cols="9" lg="9" md="8" sm="9">
-        <v-form v-model="valid" ref="form" >
+        <v-form v-model="valid" ref="form">
           <v-row>
             <v-text-field
               color="green"
@@ -230,18 +230,17 @@ export default {
     this.state.currentdate = this.currentdate();
     console.log(this.$store.state.goals);
     console.log(this);
-    this.form=Object.assign({},this.state);
-    
+    this.form = Object.assign({}, this.state);
   },
   watch: {
     process: function(val) {
       if (val == "complete") {
         this.$refs.form.reset();
-        this.state = Object.assign({},this.form);
-        this.date= this.currentdate();
-        this.process="";
+        this.state = Object.assign({}, this.form);
+        this.date = this.currentdate();
+        this.process = "";
         this.$refs.form.resetValidation();
-        
+
         // this.$forceUpdated();
       }
     },
@@ -286,7 +285,7 @@ export default {
     },
     DailyTime: function() {
       let time = Number(new Date(Date.now()).toTimeString().slice(0, 2));
-      if (time>= 0 && time < 8) {
+      if (time >= 0 && time < 8) {
         return "8:00";
       } else if (time < 13) {
         return "13:00";
@@ -333,12 +332,12 @@ export default {
         month = String("0" + (date.getMonth() + 1));
       } else {
         month = String(date.getMonth() + 1);
-      };
+      }
       let day;
       if (Number(date.getDate()) <= 9) {
-        day = String("0" + (date.getDate()));
+        day = String("0" + date.getDate());
       } else {
-        day = String(date.getDate() );
+        day = String(date.getDate());
       }
 
       let actually = `${year}-${month}-${day}`;
@@ -351,9 +350,7 @@ export default {
       this.state.steps.values.splice(index, 1);
     }
   },
-  updated(){
-
-  }
+  updated() {}
 };
 </script>
 <style scoped>

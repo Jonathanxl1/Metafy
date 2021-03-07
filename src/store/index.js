@@ -7,8 +7,7 @@ export default new Vuex.Store({
   state: {
     goals: []
   },
-  mutations: {   
-  },
+  mutations: {},
   actions: {},
   modules: {}
 });

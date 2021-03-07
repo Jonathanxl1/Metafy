@@ -1,11 +1,16 @@
 <template>
   <div>
-     <v-carousel :light="true"  :hide-delimiter-background="true" :hide-delimiter="true" :hide-delimiters="true" :show-arrows="Object.keys(state).length > 1 " >
-      <v-carousel-item v-for="(goal,i) in state" :key="i"> 
-        <viewGoal :state="goal" :id="Number(i)" :timer="Number(now)" ></viewGoal>
+    <v-carousel
+      :light="true"
+      :hide-delimiter-background="true"
+      :hide-delimiter="true"
+      :hide-delimiters="true"
+      :show-arrows="Object.keys(state).length > 1"
+    >
+      <v-carousel-item v-for="(goal, i) in state" :key="i">
+        <viewGoal :state="goal" :id="Number(i)" :timer="Number(now)"></viewGoal>
       </v-carousel-item>
-    </v-carousel> 
-    
+    </v-carousel>
   </div>
 </template>
 
@@ -20,7 +25,7 @@ export default {
   data() {
     return {
       state: {},
-      now:"",
+      now: ""
     };
   },
   created() {
@@ -32,13 +37,13 @@ export default {
       .catch(error => {
         console.error(error);
       });
-      this.timer();
+    this.timer();
   },
-  methods:{
-    timer:function(){
-      setInterval(()=>{
+  methods: {
+    timer: function() {
+      setInterval(() => {
         this.now = new Date(Date.now()).getTime();
-      },1000)
+      }, 1000);
     }
   }
 };

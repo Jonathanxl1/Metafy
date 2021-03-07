@@ -52,7 +52,7 @@ export default {
       }
       console.log(value);
     },
-    "$route": function() {
+    $route: function() {
       this.viewer = false;
     }
   }

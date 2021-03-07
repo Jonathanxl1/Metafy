@@ -63,21 +63,18 @@ export default {
     id: {
       type: Number
     },
-    timer:{
-      type:Number
+    timer: {
+      type: Number
     }
-
   },
   components: {},
   mounted() {
     console.log(this.$vuetify.breakpoint);
-    
   },
   data() {
     return {
       value: 0,
-      goal: this.state,
-      
+      goal: this.state
     };
   },
   computed: {
@@ -99,13 +96,12 @@ export default {
       if (now > goal) {
         this.value = 0;
       } else {
-        let diffCurrent = Math.ceil(Math.abs(goal - now) );
+        let diffCurrent = Math.ceil(Math.abs(goal - now));
         let diffDates = Math.ceil(Math.abs(goal - start));
 
         let total = (diffCurrent * 100) / diffDates;
         this.value = total;
-      console.log(this.value,diffCurrent,diffDates);
-
+        console.log(this.value, diffCurrent, diffDates);
       }
 
       // Math.ceil(diffCurrent/86400000)
@@ -120,10 +116,9 @@ export default {
       }
     }
   },
-  watch:{
-    "timer":function(){
+  watch: {
+    timer: function() {
       this.diffDates();
-
     }
   }
 };

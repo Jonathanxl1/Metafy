@@ -1,7 +1,6 @@
-var Countdown= setInterval(this.counter,1000);
+var Countdown = setInterval(this.counter, 1000);
 
-
-function StopCountdown(){
+function StopCountdown() {
   return clearInterval(Countdown);
 }
 

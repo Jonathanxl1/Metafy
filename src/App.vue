@@ -1,11 +1,9 @@
 <template>
   <v-app>
-    
-      <v-app-bar app color="green" dark>
+    <v-app-bar app color="green" dark>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Metafy</v-toolbar-title>
       <v-spacer></v-spacer>
-      
     </v-app-bar>
     <NavMenu v-on:view="view" :state="drawer"></NavMenu>
 
@@ -30,11 +28,10 @@ export default {
       drawer: false
     };
   },
-  methods:{
-    view:function(value){
-      this.drawer = value
+  methods: {
+    view: function(value) {
+      this.drawer = value;
     }
   }
-  
 };
 </script>

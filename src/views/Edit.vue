@@ -5,7 +5,9 @@
         <v-form v-model="valid" ref="form">
           <v-row justify="center">
             <v-switch label="Reiniciar desde cero" v-model="reboot"> </v-switch>
-            <div v-if="!reboot" class="text-center justify-center mt-5 ml-2">Fecha de Inicio: {{this.state.currentdate}}</div>
+            <div v-if="!reboot" class="text-center justify-center mt-5 ml-2">
+              Fecha de Inicio: {{ this.state.currentdate }}
+            </div>
           </v-row>
           <v-row>
             <v-text-field
@@ -172,7 +174,7 @@ export default {
     return {
       id: this.$route.params.id,
       process: "",
-      reboot:false,
+      reboot: false,
       valid: false,
       rulesTitle: [
         value => !!value || "Required",
@@ -286,7 +288,7 @@ export default {
         });
     },
     updateGoal: function() {
-      if(this.reboot){
+      if (this.reboot) {
         this.state.currentdate = this.currentdate();
       }
       db.updateGoal(this.state, this.id)

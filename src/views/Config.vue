@@ -3,64 +3,30 @@
     <v-row justify="center">
       <v-col cols="9" lg="7" md="8" sm="9">
         <v-form v-model="valid" ref="form">
-          <v-text-field
-            label="Tu nombre"
-            outlined
-            filled
-            v-model="data.name"
-          ></v-text-field>
+          <v-text-field label="Tu nombre" outlined filled></v-text-field>
 
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Corto Plazo'"
           ></h1>
-          <v-select
-            label="Tiempo de Corto Plazo"
-            :items="numbers"
-            :value="!data.short.value ? def.short.value : data.short.value"
-            v-model="data.short.value"
-          ></v-select>
-          <v-select
-            label="Periodos de Corto Plazo"
-            :items="time"
-            :value="!data.short.period ? def.short.period : data.short.period"
-            v-model="data.short.period"
-          >
-          </v-select>
+          <v-select label="Tiempo de Corto Plazo" :items="numbers"></v-select>
+          <v-select label="Periodos de Corto Plazo" :items="time"> </v-select>
 
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Medio plazo'"
           ></h1>
 
-          <v-select
-            label="Tiempo de Mediano plazo"
-            :items="numbers"
-            :value="!data.medium.value ? def.medium.value : data.medium.value"
-          >
+          <v-select label="Tiempo de Mediano plazo" :items="numbers">
           </v-select>
-          <v-select
-            label="Periodos de Mediano Plazo"
-            :items="time"
-            :value="
-              !data.medium.period ? def.medium.period : data.medium.period
-            "
-            v-model="data.medium.period"
-          >
-          </v-select>
+          <v-select label="Periodos de Mediano Plazo" :items="time"> </v-select>
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Largo plazo'"
           ></h1>
 
           <v-select :items="numbers" label="Tiempo de Largo plazo"> </v-select>
-          <v-select
-            label="Periodos de Mediano Plazo"
-            :items="time"
-            :value="!data.long.period ? def.long.period : data.long.period"
-            v-model="data.long.period"
-          >
-          </v-select>
+          <v-select label="Periodos de Mediano Plazo" :items="time"> </v-select>
 
           <v-row justify="center">
             <v-btn :x-large="true" color="success">Guardar</v-btn>
@@ -109,8 +75,13 @@
 </template>
 
 <script>
+import db from "../store/localdata";
+
 export default {
   name: "Config",
+  mounted() {
+    this.config();
+  },
   data() {
     return {
       dialog: false,
@@ -129,18 +100,20 @@ export default {
           value: 4
         }
       },
-      data: {
-        name: "",
+      configuration: {
         short: {
           period: null,
+          time: "",
           value: null
         },
         medium: {
           period: null,
+          time: "",
           value: null
         },
         long: {
           period: null,
+          time: "",
           value: null
         }
       },
@@ -150,6 +123,16 @@ export default {
       ],
       numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     };
+  },
+  methods: {
+    config: function() {
+      db.retriveConfig()
+        .then(
+          data =>
+            (this.configuration = Object.assign({}, this.configuration, data))
+        )
+        .catch(e => console.error(e));
+    }
   }
 };
 </script>

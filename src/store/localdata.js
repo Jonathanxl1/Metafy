@@ -13,10 +13,12 @@ function mountDb() {
     goals.createIndex("by_title", "title");
     goals.createIndex("by_status", "status.value");
     let conf = db.createObjectStore(config, { autoIncrement: true });
+    conf.createIndex("by_name", "name");
     conf.createIndex("by_times", "time");
     conf.put({ time: "short", period: 1, value: 3 });
     conf.put({ time: "medium", period: 1, value: 6 });
     conf.put({ time: "long", period: 2, value: 1 });
+    conf.put({ name: "" });
   };
 
   request.onsuccess = function(event) {
@@ -143,6 +145,45 @@ function retriveGoal(value) {
   });
 }
 
+function retriveConfig() {
+  return new Promise(function(resolve, reject) {
+    let request = indexedDB.open("Metafy");
+    request.onsuccess = function() {
+      let db = request.result;
+      let tx = db.transaction("config", "readwrite");
+      let store = tx.objectStore("config");
+      
+      let user = store.index("by_name");
+      let name = user.openCursor(IDBKeyRange.only("name"));
+
+      let index = store.index("by_times");
+      let short = index.openCursor(IDBKeyRange.only("short"));
+      let medium = index.openCursor(IDBKeyRange.only("medium"));
+      let long = index.openCursor(IDBKeyRange.only("long"));
+      
+
+      tx.oncomplete = function() {
+        let s = short.result;
+        let l = long.result;
+        let m = medium.result;
+        let n = name.result;
+        let data = {
+          short: s.value,
+          medium: m.value,
+          long: l.value,
+          name: n.value
+        };
+        db.close();
+        resolve(data);
+      };
+
+      tx.onerror = function(event) {
+        reject(event);
+      };
+    };
+  });
+}
+
 function updateGoal(value, key) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
@@ -195,5 +236,6 @@ export default {
   mountDb,
   retriveGoal,
   retriveGoals,
+  retriveConfig,
   resetAll
 };
