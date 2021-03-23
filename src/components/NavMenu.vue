@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app v-model="viewer" :stateless="true">
+  <v-navigation-drawer app v-model="viewer" temporary>
     <v-list>
       <v-list-item link to="/">
         <v-list-item-icon>

@@ -13,12 +13,11 @@ function mountDb() {
     goals.createIndex("by_title", "title");
     goals.createIndex("by_status", "status.value");
     let conf = db.createObjectStore(config, { autoIncrement: true });
-    conf.createIndex("by_name", "name");
+
     conf.createIndex("by_times", "time");
     conf.put({ time: "short", period: 1, value: 3 });
     conf.put({ time: "medium", period: 1, value: 6 });
     conf.put({ time: "long", period: 2, value: 1 });
-    conf.put({ name: "" });
   };
 
   request.onsuccess = function(event) {
@@ -81,9 +80,9 @@ function resetAll() {
       let tx = db.transaction("goals", "readwrite");
       let goals = tx.objectStore("goals");
       goals.clear();
-      let tx2 = db.transaction("config", "readwrite");
-      let config = tx2.objectStore("config");
-      config.delete(name);
+      // let tx2 = db.transaction("config", "readwrite");
+      // let config = tx2.objectStore("config");
+      // config.clear();
       tx.oncomplete = function() {
         db.close();
         resolve(true);
@@ -91,7 +90,7 @@ function resetAll() {
 
       tx.onerror = function() {
         db.close();
-        reject();
+        reject(false);
       };
     };
   });
@@ -102,23 +101,28 @@ function retriveGoals() {
     let request = indexedDB.open("Metafy");
     request.onsuccess = function() {
       let db = request.result;
-      let tx = db.transaction("goals", "readwrite");
-      let store = tx.objectStore("goals");
-      let values = store.getAll();
-      var keys = store.getAllKeys();
+      if (db.objectStoreNames.length > 0) {
+        let tx = db.transaction("goals", "readwrite");
+        let store = tx.objectStore("goals");
+        let values = store.getAll();
+        var keys = store.getAllKeys();
 
-      tx.oncomplete = function() {
-        let k = keys.result;
-        let v = values.result;
-        let data = k.reduce((a, k, i) => ({ ...a, [`${k}`]: v[i] }), {});
+        tx.oncomplete = function() {
+          let k = keys.result;
+          let v = values.result;
+          let data = k.reduce((a, k, i) => ({ ...a, [`${k}`]: v[i] }), {});
+          db.close();
+          resolve(data);
+          console.info(data);
+        };
+
+        tx.onerror = function(event) {
+          reject(event);
+        };
+      } else {
         db.close();
-        resolve(data);
-        console.info(data);
-      };
-
-      tx.onerror = function(event) {
-        reject(event);
-      };
+        console.log("No Goals");
+      }
     };
   });
 }
@@ -152,26 +156,21 @@ function retriveConfig() {
       let db = request.result;
       let tx = db.transaction("config", "readwrite");
       let store = tx.objectStore("config");
-      
-      let user = store.index("by_name");
-      let name = user.openCursor(IDBKeyRange.only("name"));
 
       let index = store.index("by_times");
       let short = index.openCursor(IDBKeyRange.only("short"));
       let medium = index.openCursor(IDBKeyRange.only("medium"));
       let long = index.openCursor(IDBKeyRange.only("long"));
-      
 
       tx.oncomplete = function() {
         let s = short.result;
         let l = long.result;
         let m = medium.result;
-        let n = name.result;
+
         let data = {
           short: s.value,
           medium: m.value,
-          long: l.value,
-          name: n.value
+          long: l.value
         };
         db.close();
         resolve(data);
@@ -179,6 +178,34 @@ function retriveConfig() {
 
       tx.onerror = function(event) {
         reject(event);
+      };
+    };
+  });
+}
+
+function addConfig(short, medium, long) {
+  return new Promise(function(resolve, reject) {
+    let request = indexedDB.open(BASE);
+    request.onerror = function(event) {
+      console.error(event);
+    };
+    request.onsuccess = function() {
+      let db = request.result;
+      let tx = db.transaction("config", "readwrite");
+      let store = tx.objectStore("config");
+      store.put(short, 1);
+      store.put(medium, 2);
+      store.put(long, 3);
+      tx.oncomplete = function(event) {
+        db.close();
+        console.info(store);
+        resolve(event.type.toString());
+      };
+
+      tx.onerror = function(event) {
+        console.error(event);
+        db.close();
+        reject(event.type.toString());
       };
     };
   });
@@ -237,5 +264,6 @@ export default {
   retriveGoal,
   retriveGoals,
   retriveConfig,
+  addConfig,
   resetAll
 };

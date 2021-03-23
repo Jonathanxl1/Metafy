@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app color="green" dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Metafy</v-toolbar-title>
       <v-spacer></v-spacer>
     </v-app-bar>

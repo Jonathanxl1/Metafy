@@ -3,33 +3,65 @@
     <v-row justify="center">
       <v-col cols="9" lg="7" md="8" sm="9">
         <v-form v-model="valid" ref="form">
-          <v-text-field label="Tu nombre" outlined filled></v-text-field>
-
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Corto Plazo'"
           ></h1>
-          <v-select label="Tiempo de Corto Plazo" :items="numbers"></v-select>
-          <v-select label="Periodos de Corto Plazo" :items="time"> </v-select>
+          <v-select
+            label="Tiempo de Corto Plazo"
+            :items="numbers"
+            :value="configuration.short.value"
+            v-model="configuration.short.value"
+          ></v-select>
+          <v-select
+            label="Periodos de Corto Plazo"
+            :items="time"
+            :value="configuration.short.period"
+             v-model="configuration.short.period"
+          >
+          </v-select>
 
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Medio plazo'"
           ></h1>
 
-          <v-select label="Tiempo de Mediano plazo" :items="numbers">
+          <v-select
+            label="Tiempo de Mediano plazo"
+            :items="numbers"
+            :value="configuration.medium.value"
+            v-model="configuration.medium.value"
+          >
           </v-select>
-          <v-select label="Periodos de Mediano Plazo" :items="time"> </v-select>
+          <v-select
+            label="Periodos de Mediano Plazo"
+            :items="time"
+            :value="configuration.medium.period"
+            v-model="configuration.medium.period"
+          >
+          </v-select>
           <h1
             class="text-sm-subtitle-1 text-md-h6 text-center"
             v-text="'Largo plazo'"
           ></h1>
 
-          <v-select :items="numbers" label="Tiempo de Largo plazo"> </v-select>
-          <v-select label="Periodos de Mediano Plazo" :items="time"> </v-select>
+          <v-select
+            :items="numbers"
+            label="Tiempo de Largo plazo"
+            :value="configuration.long.value"
+            v-model="configuration.long.value"
+          >
+          </v-select>
+          <v-select
+            label="Periodos de Mediano Plazo"
+            :items="time"
+            :value="configuration.long.period"
+            v-model="configuration.long.period"
+          >
+          </v-select>
 
           <v-row justify="center">
-            <v-btn :x-large="true" color="success">Guardar</v-btn>
+            <v-btn :x-large="true" color="success" @click="UpConfig()" >Guardar</v-btn>
           </v-row>
         </v-form>
         <v-dialog v-model="dialog" persistent max-width="290">
@@ -86,6 +118,8 @@ export default {
     return {
       dialog: false,
       valid: false,
+      resetAll: null,
+      update: null,
       def: {
         short: {
           period: 1,
@@ -132,6 +166,26 @@ export default {
             (this.configuration = Object.assign({}, this.configuration, data))
         )
         .catch(e => console.error(e));
+    },
+    del: function() {
+      db.resetAll()
+        .then(data => {
+          this.resetAll = data;
+          this.dialog = false;
+        })
+        .catch(e => {
+          this.resetAll = e;
+          this.dialog = false;
+        });
+    },
+    UpConfig: function() {
+      let short = this.configuration.short;
+      let medium = this.configuration.medium;
+      let long = this.configuration.long;
+
+      db.addConfig(short, medium, long)
+        .then(data => (this.update = data))
+        .catch(e => (this.update = e));
     }
   }
 };
