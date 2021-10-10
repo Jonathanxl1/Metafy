@@ -228,8 +228,6 @@ export default {
   },
   mounted() {
     this.state.currentdate = this.currentdate();
-    console.log(this.$store.state.goals);
-    console.log(this);
     this.form = Object.assign({}, this.state);
   },
   watch: {

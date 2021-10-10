@@ -68,9 +68,6 @@ export default {
     }
   },
   components: {},
-  mounted() {
-    console.log(this.$vuetify.breakpoint);
-  },
   data() {
     return {
       value: 0,
@@ -101,7 +98,6 @@ export default {
 
         let total = (diffCurrent * 100) / diffDates;
         this.value = total;
-        console.log(this.value, diffCurrent, diffDates);
       }
 
       // Math.ceil(diffCurrent/86400000)
