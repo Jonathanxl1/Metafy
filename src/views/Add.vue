@@ -328,7 +328,7 @@ export default {
       let date = new Date();
       let year = date.getFullYear();
       let month;
-      if (Number(date.getMonth()) <= 9) {
+      if (Number(date.getMonth()) < 9) {
         month = String("0" + (date.getMonth() + 1));
       } else {
         month = String(date.getMonth() + 1);
