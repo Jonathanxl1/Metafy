@@ -44,6 +44,7 @@ export default {
   },
   methods: {
     timer: function() {
+      
       setInterval(() => {
         this.now = new Date(Date.now()).getTime()  ;
       }, 1000);
