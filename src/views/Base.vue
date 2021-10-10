@@ -1,20 +1,37 @@
 <template>
-  <div>
-    <v-btn fab elevation="2" x-large v-if="Object.keys(state).length <= 0">
-      <v-icon>add</v-icon>
-    </v-btn>
-    <v-carousel
-      :light="true"
-      :hide-delimiter-background="true"
-      :hide-delimiter="true"
-      :hide-delimiters="true"
-      :show-arrows="Object.keys(state).length > 1"
-    >
-      <v-carousel-item v-for="(goal, i) in state" :key="i">
-        <viewGoal :state="goal" :id="Number(i)" :timer="Number(now)"></viewGoal>
-      </v-carousel-item>
-    </v-carousel>
-  </div>
+  <v-container>
+    <v-row align-content="center">
+      <v-col lg="6" offset-lg="3">
+        <v-row justify="center" class="align-center">
+          <v-btn
+            fab
+            elevation="2"
+            x-large
+            v-if="Object.keys(state).length <= 0"
+            @click="addGoal()"
+          >
+            <v-icon color="success">add</v-icon>
+          </v-btn>
+        </v-row>
+
+        <v-carousel
+          :light="true"
+          :hide-delimiter-background="true"
+          :hide-delimiter="true"
+          :hide-delimiters="true"
+          :show-arrows="Object.keys(state).length > 1"
+        >
+          <v-carousel-item v-for="(goal, i) in state" :key="i">
+            <viewGoal
+              :state="goal"
+              :id="Number(i)"
+              :timer="Number(now)"
+            ></viewGoal>
+          </v-carousel-item>
+        </v-carousel>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -46,6 +63,9 @@ export default {
       setInterval(() => {
         this.now = new Date(Date.now()).getTime();
       }, 1000);
+    },
+    addGoal() {
+      this.$router.push("add");
     }
   }
 };
