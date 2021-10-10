@@ -2,6 +2,9 @@ const BASE = "Metafy";
 const table = "goals";
 const config = "config";
 
+const YEAR = 3.156e10;
+const MONTH = 26298e5;
+
 function mountDb() {
   let request = indexedDB.open(BASE);
 
@@ -265,5 +268,7 @@ export default {
   retriveGoals,
   retriveConfig,
   addConfig,
-  resetAll
+  resetAll,
+  YEAR,
+  MONTH
 };
