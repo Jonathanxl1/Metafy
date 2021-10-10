@@ -35,7 +35,6 @@ export default {
     db.retriveGoals()
       .then(data => {
         this.state = data;
-        console.info(Object.keys(this.state).length);
       })
       .catch(error => {
         console.error(error);
