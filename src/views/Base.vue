@@ -1,5 +1,8 @@
 <template>
   <div>
+    <v-btn fab elevation="2" x-large v-if="Object.keys(state).length <= 0">
+      <v-icon>add</v-icon>
+    </v-btn>
     <v-carousel
       :light="true"
       :hide-delimiter-background="true"
@@ -42,7 +45,7 @@ export default {
   methods: {
     timer: function() {
       setInterval(() => {
-        this.now = new Date(Date.now()).getTime();
+        this.now = new Date(Date.now()).getTime()  ;
       }, 1000);
     }
   }
