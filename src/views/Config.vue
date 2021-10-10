@@ -17,7 +17,7 @@
             label="Periodos de Corto Plazo"
             :items="time"
             :value="configuration.short.period"
-             v-model="configuration.short.period"
+            v-model="configuration.short.period"
           >
           </v-select>
 
@@ -61,7 +61,9 @@
           </v-select>
 
           <v-row justify="center">
-            <v-btn :x-large="true" color="success" @click="UpConfig()" >Guardar</v-btn>
+            <v-btn :x-large="true" color="success" @click="UpConfig()"
+              >Guardar</v-btn
+            >
           </v-row>
         </v-form>
         <v-dialog v-model="dialog" persistent max-width="290">

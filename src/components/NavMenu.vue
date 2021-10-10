@@ -50,7 +50,6 @@ export default {
       if (value != oldvalue) {
         this.$emit("view", value);
       }
-      console.log(value);
     },
     $route: function() {
       this.viewer = false;
