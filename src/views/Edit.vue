@@ -276,7 +276,7 @@ export default {
     }
   },
   methods: {
-    goal: function() {
+    goal() {
       let id = this.id;
       db.retriveGoal(id)
         .then(data => {
@@ -287,7 +287,7 @@ export default {
           console.error(error);
         });
     },
-    updateGoal: function() {
+    updateGoal() {
       if (this.reboot) {
         this.state.currentdate = this.currentdate();
       }
