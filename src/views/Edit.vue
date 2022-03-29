@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { retriveGoal, updateGoal } from "../store/localdata";
 
 export default {
   name: "Edit",
@@ -278,7 +278,7 @@ export default {
   methods: {
     goal() {
       let id = this.id;
-      db.retriveGoal(id)
+      retriveGoal(id)
         .then(data => {
           this.state = Object.assign({}, this.state, data);
           console.info(data);
@@ -291,7 +291,7 @@ export default {
       if (this.reboot) {
         this.state.currentdate = this.currentdate();
       }
-      db.updateGoal(this.state, this.id)
+      updateGoal(this.state, this.id)
         .then(data => {
           this.update = data;
         })
