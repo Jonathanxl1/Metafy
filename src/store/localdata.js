@@ -2,7 +2,7 @@ const BASE = "Metafy";
 const table = "goals";
 const config = "config";
 
-function mountDb() {
+export function mountDb() {
   let request = indexedDB.open(BASE);
 
   request.onupgradeneeded = function() {
@@ -33,7 +33,7 @@ function mountDb() {
   };
 }
 
-function addGoal(value) {
+export function addGoal(value) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onerror = function(event) {
@@ -59,7 +59,7 @@ function addGoal(value) {
   });
 }
 
-function desmountDb() {
+export function desmountDb() {
   let request = indexedDB.open(BASE);
   let db = request.result;
   if (db.objectStoreNames.length == 0) {
@@ -72,7 +72,7 @@ function desmountDb() {
   }
 }
 
-function resetAll() {
+export function resetAll() {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onsuccess = function() {
@@ -96,7 +96,7 @@ function resetAll() {
   });
 }
 
-function retriveGoals() {
+export function retriveGoals() {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open("Metafy");
     request.onsuccess = function() {
@@ -127,7 +127,7 @@ function retriveGoals() {
   });
 }
 
-function retriveGoal(value) {
+export function retriveGoal(value) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open("Metafy");
     request.onsuccess = function() {
@@ -149,7 +149,7 @@ function retriveGoal(value) {
   });
 }
 
-function retriveConfig() {
+export function retriveConfig() {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open("Metafy");
     request.onsuccess = function() {
@@ -183,7 +183,7 @@ function retriveConfig() {
   });
 }
 
-function addConfig(short, medium, long) {
+export function addConfig(short, medium, long) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onerror = function(event) {
@@ -211,7 +211,7 @@ function addConfig(short, medium, long) {
   });
 }
 
-function updateGoal(value, key) {
+export function updateGoal(value, key) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onsuccess = function() {
@@ -234,7 +234,7 @@ function updateGoal(value, key) {
   });
 }
 
-function deleteGoal(value) {
+export function deleteGoal(value) {
   return new Promise(function(resolve, reject) {
     let request = indexedDB.open(BASE);
     request.onsuccess = function() {
@@ -254,16 +254,3 @@ function deleteGoal(value) {
     };
   });
 }
-
-export default {
-  addGoal,
-  updateGoal,
-  deleteGoal,
-  desmountDb,
-  mountDb,
-  retriveGoal,
-  retriveGoals,
-  retriveConfig,
-  addConfig,
-  resetAll
-};
