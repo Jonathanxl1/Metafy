@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import { retriveGoal, updateGoal } from "../store/localdata";
+import { retriveGoal, updateGoal } from "../store/localdata.js";
 
 export default {
   name: "Edit",
@@ -232,7 +232,8 @@ export default {
           text: "Personalizado",
           value: 4
         }
-      ]
+      ],
+      times: {}
     };
   },
   mounted() {

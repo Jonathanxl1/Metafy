@@ -15,13 +15,13 @@
 <script>
 // import HelloWorld from "./components/HelloWorld";
 import NavMenu from "./components/NavMenu";
-import db from "./store/localdata";
+import { mountDb } from "./store/localdata";
 
 export default {
   name: "App",
   components: { NavMenu },
   created() {
-    db.mountDb();
+    mountDb();
   },
   data() {
     return {

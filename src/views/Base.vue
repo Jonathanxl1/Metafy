@@ -37,7 +37,7 @@
 <script>
 // @ is an alias to /src
 import viewGoal from "@/components/ViewGoal.vue";
-import db from "../store/localdata";
+import { retriveGoals } from "../store/localdata";
 
 export default {
   name: "Base",
@@ -49,7 +49,7 @@ export default {
     };
   },
   created() {
-    db.retriveGoals()
+    retriveGoals()
       .then(data => {
         this.state = data;
       })

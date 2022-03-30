@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { deleteGoal, retriveGoal, updateGoal } from "../store/localdata";
 // import time from "../time";
 // var countdown = setInterval(counter,1000);
 
@@ -150,7 +150,7 @@ export default {
     },
     goal: function() {
       let id = this.id;
-      db.retriveGoal(id)
+      retriveGoal(id)
         .then(data => {
           this.state = Object.assign({}, this.state, data);
           this.overlay = false;
@@ -205,12 +205,12 @@ export default {
     done: function() {
       this.state.status.value = "done";
       this.state.status.date = Date.now();
-      db.updateGoal(this.state, this.id)
+      updateGoal(this.state, this.id)
         .then(data => (this.complete = data))
         .catch(data => (this.complete = data));
     },
     del: function() {
-      db.deleteGoal(Number(this.id))
+      deleteGoal(Number(this.id))
         .then(data => (this.delete = data))
         .catch(data => (this.delete = data));
     }

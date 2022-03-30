@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { addConfig, resetAll, retriveConfig } from "../store/localdata";
 
 export default {
   name: "Config",
@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     config: function() {
-      db.retriveConfig()
+      retriveConfig()
         .then(
           data =>
             (this.configuration = Object.assign({}, this.configuration, data))
@@ -170,7 +170,7 @@ export default {
         .catch(e => console.error(e));
     },
     del: function() {
-      db.resetAll()
+      resetAll()
         .then(data => {
           this.resetAll = data;
           this.dialog = false;
@@ -185,7 +185,7 @@ export default {
       let medium = this.configuration.medium;
       let long = this.configuration.long;
 
-      db.addConfig(short, medium, long)
+      addConfig(short, medium, long)
         .then(data => (this.update = data))
         .catch(e => (this.update = e));
     }

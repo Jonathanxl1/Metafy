@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { addGoal } from "../store/localdata";
 
 export default {
   name: "Add",
@@ -273,7 +273,7 @@ export default {
   },
   methods: {
     addGoal() {
-      db.addGoal(this.state)
+      addGoal(this.state)
         .then(data => {
           this.process = data;
         })
