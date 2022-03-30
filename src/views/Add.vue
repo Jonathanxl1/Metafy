@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import { addGoal } from "../store/localdata";
+import { addGoal, retriveConfig } from "../store/localdata";
 
 export default {
   name: "Add",
@@ -223,12 +223,16 @@ export default {
           text: "Personalizado",
           value: 4
         }
-      ]
+      ],
+      times: {}
     };
   },
   mounted() {
     this.state.currentdate = this.currentdate();
     this.form = Object.assign({}, this.state);
+    retriveConfig().then(time => {
+      this.times = Object.assign({}, time);
+    });
   },
   watch: {
     process: function(val) {
