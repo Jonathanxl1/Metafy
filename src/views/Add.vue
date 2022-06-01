@@ -38,6 +38,15 @@
             <!-- <template v-slot:item="{ item }">
               {{ item.text }} 
             </template> -->
+            <template v-slot:selection="{ item }">
+              <span>
+                {{ item.text }}
+
+                <span v-if="state.value !== 4">
+                  {{ dateByGoal(item.value) }}
+                </span>
+              </span>
+            </template>
           </v-select>
           <v-menu
             v-if="state.value == 4"
@@ -209,15 +218,15 @@ export default {
       options: [
         {
           text: `Short Time`,
-          value: 1
+          value: "short"
         },
         {
           text: "Medium Time",
-          value: 2
+          value: "medium"
         },
         {
           text: "Long Time",
-          value: 3
+          value: "long"
         },
         {
           text: "Personalizado",
@@ -350,6 +359,25 @@ export default {
     },
     remove: function(index) {
       this.state.steps.values.splice(index, 1);
+    },
+    dateByGoal(period) {
+      if (this.times[period]) {
+        let { period: typePeriod, value } = this.times[period];
+        let time = 0;
+        switch (typePeriod) {
+          case 1:
+            time = 2.628e9;
+            break;
+          case 2:
+            time = 3.154e10;
+            break;
+        }
+        let currentDate = new Date(this.state.currentdate).getTime();
+
+        return new Date(currentDate + time * value).toISOString();
+      } else {
+        return "";
+      }
     }
   },
   updated() {}
