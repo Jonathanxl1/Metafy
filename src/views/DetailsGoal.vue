@@ -6,11 +6,16 @@
     <div v-if="!overlay">
       <v-row justify="center">
         <v-col align="center">
-          <div class="text-lg-h1" @click="viewer()">
+          <div class="text-lg-h1" @click="viewer()" style="cursor:pointer">
             <div class="date" v-if="view">
-              <span>{{ timegoal() }}</span>
+              <v-icon color="red">mdi-flag-checkered</v-icon>
+              <span> {{ timegoal() }} </span>
+              <v-icon color="red">mdi-flag-checkered</v-icon>
             </div>
             <div class="coutdown" v-else>
+              <v-icon class="mdi-spin" color="green"
+                >mdi-clock-time-twelve-outline</v-icon
+              >
               <span v-if="year > 0">{{ year }} Y :</span>
               <span v-if="month > 0">{{ month }} M:</span>
               <span v-if="day > 0">{{ day }} d: </span>
