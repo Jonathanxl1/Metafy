@@ -42,9 +42,7 @@
               <span>
                 {{ item.text }}
 
-                <span v-if="state.value !== 4">
-                  {{ dateByGoal(item.value) }}
-                </span>
+                <span v-if="state.value !== 4"> ({{ dateByGoal }}) </span>
               </span>
             </template>
           </v-select>
@@ -169,6 +167,7 @@
 
 <script>
 import { addGoal, retriveConfig } from "../store/localdata";
+import moment from "moment";
 
 export default {
   name: "Add",
@@ -233,7 +232,12 @@ export default {
           value: 4
         }
       ],
-      times: {}
+      times: {},
+      typePeriodObj: {
+        "1": "M",
+        "2": "y"
+      },
+      dateGoal: ""
     };
   },
   mounted() {
@@ -265,8 +269,15 @@ export default {
     // },
     "state.value": function(v) {
       if (v != 4) {
-        this.state.datetime = this.actually();
-      } else {
+        let { period: typePeriod, value } = this.times[v];
+
+        this.dateGoal = this.addDatetime(
+          this.state.currentdate,
+          value,
+          this.typePeriodObj[typePeriod]
+        );
+        this.state.date = this.dateGoal.format("YYYY-MM-DD");
+        this.state.time = this.dateGoal.format("HH:mm");
         this.state.datetime = `${this.state.date} ${this.state.time}`;
       }
     },
@@ -360,27 +371,17 @@ export default {
     remove: function(index) {
       this.state.steps.values.splice(index, 1);
     },
-    dateByGoal(period) {
-      if (this.times[period]) {
-        let { period: typePeriod, value } = this.times[period];
-        let time = 0;
-        switch (typePeriod) {
-          case 1:
-            time = 2.628e9;
-            break;
-          case 2:
-            time = 3.154e10;
-            break;
-        }
-        let currentDate = new Date(this.state.currentdate).getTime();
+    addDatetime: (date, value, time) => {
+      return moment(date).add(value, time);
+    },
 
-        return new Date(currentDate + time * value).toISOString();
-      } else {
-        return "";
-      }
-    }
+    updated() {}
   },
-  updated() {}
+  computed: {
+    dateByGoal() {
+      return this.dateGoal.format("YYYY/MM/DD HH:mm");
+    }
+  }
 };
 </script>
 <style scoped>
