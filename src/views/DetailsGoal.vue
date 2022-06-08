@@ -109,6 +109,7 @@
 
 <script>
 import { deleteGoal, retriveGoal, updateGoal } from "../store/localdata";
+import moment from "moment";
 // import time from "../time";
 // var countdown = setInterval(counter,1000);
 
@@ -117,9 +118,6 @@ export default {
   mounted() {
     this.overlay = true;
     this.goal();
-  },
-  created() {
-    // this.countdown;
   },
   data() {
     return {
@@ -150,18 +148,20 @@ export default {
   },
 
   methods: {
-    countdown: function() {
+    countdown() {
       this.countId = setInterval(this.counter, 1000);
     },
-    goal: function() {
+    goal() {
       let id = this.id;
       retriveGoal(id)
         .then(data => {
           this.state = Object.assign({}, this.state, data);
           this.overlay = false;
-          let goal = new Date(this.state.datetime).getTime();
-          let now = new Date(Date.now()).getTime();
-          if (goal > now) {
+          // let goal = new Date(this.state.datetime).getTime();
+          let goal = moment(this.state.datetime);
+
+          // let now = new Date(Date.now()).getTime();
+          if (goal.isAfter(moment())) {
             this.countdown();
           }
           console.info(data);
@@ -171,16 +171,17 @@ export default {
         });
     },
 
-    counter: function() {
+    counter() {
       const sec = 1000,
         min = sec * 60,
         hour = min * 60,
         day = hour * 24;
-      let now = Date.now();
-      let goal = this.state.datetime;
+      // let now = Date.now();
+      let { datetime: goal } = this.state;
 
-      let diff = new Date(goal).getTime() - new Date(now).getTime();
+      // let diff = new Date(goal).getTime() - new Date(now).getTime();
       // let time = new Date(counter);
+      let diff = moment(goal).diff(moment());
 
       this.time = diff;
       this.day = Math.floor(diff / day);
@@ -188,40 +189,27 @@ export default {
       this.min = Math.floor((diff % hour) / min);
       this.sec = Math.floor((diff % min) / sec);
     },
-    viewer: function() {
+    viewer() {
       this.view = !this.view;
     },
-    timegoal: function() {
-      let date = new Date(this.state.datetime);
-      let year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      let day = date.getDate();
-      let hour = date.getHours();
-      let min = date.getMinutes();
-      if (min < 10) {
-        min = "0" + min;
-      }
-      if (hour < 10) {
-        hour = "0" + hour;
-      }
-
-      return `${day} / ${month} / ${year} ${hour} : ${min}`;
+    timegoal() {
+      return moment(this.state.datetime).format("DD / MM / YYYY HH:mm");
     },
-    done: function() {
+    done() {
       this.state.status.value = "done";
       this.state.status.date = Date.now();
       updateGoal(this.state, this.id)
         .then(data => (this.complete = data))
         .catch(data => (this.complete = data));
     },
-    del: function() {
+    del() {
       deleteGoal(Number(this.id))
         .then(data => (this.delete = data))
         .catch(data => (this.delete = data));
     }
   },
   watch: {
-    complete: function(value) {
+    complete(value) {
       if (value && value !== null) {
         this.$router.push({ path: "/" });
         console.log("Complete to goal");
@@ -229,7 +217,7 @@ export default {
         console.log("Failed");
       }
     },
-    delete: function(value) {
+    delete(value) {
       if (value && value !== null) {
         this.$router.push({ path: "/" });
         console.log("Delete goal");
@@ -237,7 +225,7 @@ export default {
         console.log("Failed to Delete goals");
       }
     },
-    time: function(value) {
+    time(value) {
       // let now = new Date (Date.now()).getTime();
       if (value < 999) {
         clearInterval(this.countId);
