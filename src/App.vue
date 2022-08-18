@@ -7,25 +7,32 @@
     </v-app-bar>
     <NavMenu v-on:view="view" :state="drawer"></NavMenu>
 
-    <v-main>
-      <router-view></router-view>
+    <v-main style="width:100%;max-width:100%">
+      <loadingPage :overlay="loading" />
+      <router-view
+        @hook:created="loading = true"
+        @hook:mounted="loading = false"
+      ></router-view>
     </v-main>
   </v-app>
 </template>
 <script>
 // import HelloWorld from "./components/HelloWorld";
 import NavMenu from "./components/NavMenu";
+import loadingPage from "./views/loadingPage";
+
 import { mountDb } from "./store/localdata";
 
 export default {
   name: "App",
-  components: { NavMenu },
+  components: { NavMenu, loadingPage },
   created() {
     mountDb();
   },
   data() {
     return {
-      drawer: false
+      drawer: false,
+      loading: false
     };
   },
   methods: {
