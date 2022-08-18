@@ -1,110 +1,108 @@
 <template>
-  <v-container>
-    <v-overlay :value="overlay" dark>
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
-    <div v-if="!overlay">
-      <v-row justify="center">
-        <v-col align="center">
-          <div class="text-lg-h1" @click="viewer()" style="cursor:pointer">
-            <div class="date" v-if="view">
-              <v-icon color="red">mdi-flag-checkered</v-icon>
-              <span> {{ timegoal() }} </span>
-              <v-icon color="red">mdi-flag-checkered</v-icon>
+  <v-card height="100%" max-height="100%" elevation="0" width="100%">
+    <v-col align-self="center" cols="12" style="height:70%">
+      <v-col align-self="center">
+        <v-row justify="center">
+          <v-col align="center">
+            <div class="text-lg-h1" @click="viewer()" style="cursor:pointer">
+              <div class="date" v-if="view">
+                <v-icon color="red">mdi-flag-checkered</v-icon>
+                <span> {{ timegoal() }} </span>
+                <v-icon color="red">mdi-flag-checkered</v-icon>
+              </div>
+              <div class="coutdown" v-else>
+                <v-icon class="mdi-spin" color="green"
+                  >mdi-clock-time-twelve-outline</v-icon
+                >
+                <span v-if="year > 0">{{ year }} Y :</span>
+                <span v-if="month > 0">{{ month }} M:</span>
+                <span v-if="day > 0">{{ day }} d: </span>
+                <span>{{ hour }} h:</span>
+                <span>{{ min }}m:</span>
+                <span>{{ sec }} S</span>
+              </div>
             </div>
-            <div class="coutdown" v-else>
-              <v-icon class="mdi-spin" color="green"
-                >mdi-clock-time-twelve-outline</v-icon
+          </v-col>
+        </v-row>
+        <v-row justify="center">
+          <div class="text-lg-h3">{{ this.state.title }}</div>
+        </v-row>
+        <v-row justify="center" class="description text-center text-md-body-1">
+          {{ this.state.description }}
+        </v-row>
+        <v-row justify="center" v-if="this.state.steps.active || false">
+          <v-col align="center">
+            <v-card class="mx-auto" elevation="10">
+              <v-list>
+                <v-list-item-title>
+                  <div class="text-lg-h5">List</div>
+                </v-list-item-title>
+                <v-list-item
+                  v-for="(goal, i) in this.state.steps.values"
+                  :key="i"
+                >
+                  {{ goal }}
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-col>
+
+    <v-col align-self="end" cols="12" style="height:30%">
+      <v-row justify="space-between" class="d-flex align-self-end">
+        <v-col>
+          <v-btn
+            v-if="this.state.status.value != 'done' || false"
+            outlined
+            width="100%"
+            color="green"
+            class="done mr-2"
+            @click="done()"
+          >
+            <v-icon>done</v-icon> <span>Complete</span>
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-btn
+            width="100%"
+            color="blue"
+            outlined
+            class="mr-2"
+            :to="`${this.id}` + '/edit'"
+          >
+            <v-icon>create</v-icon><span>Edit</span>
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-dialog v-model="dialog" persistent max-width="290">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="red" outlined width="100%" v-bind="attrs" v-on="on">
+                <v-icon>delete</v-icon><span>Delete</span>
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="headline"
+                >Sure delete this goal?</v-card-title
               >
-              <span v-if="year > 0">{{ year }} Y :</span>
-              <span v-if="month > 0">{{ month }} M:</span>
-              <span v-if="day > 0">{{ day }} d: </span>
-              <span>{{ hour }} h:</span>
-              <span>{{ min }}m:</span>
-              <span>{{ sec }} S</span>
-            </div>
-          </div>
+              <v-card-text
+                >Remember you can't do recover this goal after your
+                delete!</v-card-text
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="grey darken-1" text @click="dialog = false"
+                  >Cancel</v-btn
+                >
+                <v-btn color="red darken-1" text @click="del()">Delete</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-col>
       </v-row>
-      <v-row justify="center">
-        <div class="text-lg-h3">{{ this.state.title }}</div>
-      </v-row>
-      <v-row justify="center" class="description text-center text-md-body-1">
-        {{ this.state.description }}
-      </v-row>
-      <v-row justify="center" v-if="this.state.steps.active || false">
-        <v-col align="center">
-          <v-card class="mx-auto" elevation="10">
-            <v-list>
-              <v-list-item-title>
-                <div class="text-lg-h5">List</div>
-              </v-list-item-title>
-              <v-list-item
-                v-for="(goal, i) in this.state.steps.values"
-                :key="i"
-              >
-                {{ goal }}
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row justify="center">
-        <v-btn
-          v-if="this.state.status.value != 'done' || false"
-          outlined
-          x-large
-          small
-          large
-          color="green"
-          class="done mr-2"
-          @click="done()"
-        >
-          <v-icon>done</v-icon> <span>Complete</span>
-        </v-btn>
-        <v-btn
-          x-large
-          small
-          large
-          color="blue"
-          outlined
-          class="mr-2"
-          :to="`${this.id}` + '/edit'"
-        >
-          <v-icon>create</v-icon><span>Edit</span>
-        </v-btn>
-        <v-dialog v-model="dialog" persistent max-width="290">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="red"
-              outlined
-              x-large
-              small
-              large
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>delete</v-icon><span>Delete</span>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="headline">Sure delete this goal?</v-card-title>
-            <v-card-text
-              >Remember you can't do recover this goal after your
-              delete!</v-card-text
-            >
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="grey darken-1" text @click="dialog = false"
-                >Cancel</v-btn
-              >
-              <v-btn color="red darken-1" text @click="del()">Delete</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-row>
-    </div>
-  </v-container>
+    </v-col>
+  </v-card>
 </template>
 
 <script>
