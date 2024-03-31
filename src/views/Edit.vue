@@ -165,7 +165,7 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { retriveGoal, updateGoal } from "../store/localdata.js";
 
 export default {
   name: "Edit",
@@ -232,7 +232,8 @@ export default {
           text: "Personalizado",
           value: 4
         }
-      ]
+      ],
+      times: {}
     };
   },
   mounted() {
@@ -276,9 +277,9 @@ export default {
     }
   },
   methods: {
-    goal: function() {
+    goal() {
       let id = this.id;
-      db.retriveGoal(id)
+      retriveGoal(id)
         .then(data => {
           this.state = Object.assign({}, this.state, data);
           console.info(data);
@@ -287,11 +288,11 @@ export default {
           console.error(error);
         });
     },
-    updateGoal: function() {
+    updateGoal() {
       if (this.reboot) {
         this.state.currentdate = this.currentdate();
       }
-      db.updateGoal(this.state, this.id)
+      updateGoal(this.state, this.id)
         .then(data => {
           this.update = data;
         })

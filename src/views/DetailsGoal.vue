@@ -1,109 +1,113 @@
 <template>
-  <v-container>
-    <v-overlay :value="overlay" dark>
-      <v-progress-circular indeterminate size="64"></v-progress-circular>
-    </v-overlay>
-    <div v-if="!overlay">
-      <v-row justify="center">
-        <v-col align="center">
-          <div class="text-lg-h1" @click="viewer()">
-            <div class="date" v-if="view">
-              <span>{{ timegoal() }}</span>
+  <v-card height="100%" max-height="100%" elevation="0" width="100%">
+    <v-col align-self="center" cols="12" style="height:70%">
+      <v-col align-self="center">
+        <v-row justify="center">
+          <v-col align="center">
+            <div class="text-lg-h1" @click="viewer()" style="cursor:pointer">
+              <div class="date" v-if="view">
+                <v-icon color="red">mdi-flag-checkered</v-icon>
+                <span> {{ timegoal() }} </span>
+                <v-icon color="red">mdi-flag-checkered</v-icon>
+              </div>
+              <div class="coutdown" v-else>
+                <v-icon class="mdi-spin" color="green"
+                  >mdi-clock-time-twelve-outline</v-icon
+                >
+                <span v-if="year > 0">{{ year }} Y :</span>
+                <span v-if="month > 0">{{ month }} M:</span>
+                <span v-if="day > 0">{{ day }} d: </span>
+                <span>{{ hour }} h:</span>
+                <span>{{ min }}m:</span>
+                <span>{{ sec }} S</span>
+              </div>
             </div>
-            <div class="coutdown" v-else>
-              <span v-if="year > 0">{{ year }} Y :</span>
-              <span v-if="month > 0">{{ month }} M:</span>
-              <span v-if="day > 0">{{ day }} d: </span>
-              <span>{{ hour }} h:</span>
-              <span>{{ min }}m:</span>
-              <span>{{ sec }} S</span>
-            </div>
-          </div>
+          </v-col>
+        </v-row>
+        <v-row justify="center">
+          <div class="text-lg-h3">{{ this.state.title }}</div>
+        </v-row>
+        <v-row justify="center" class="description text-center text-md-body-1">
+          {{ this.state.description }}
+        </v-row>
+        <v-row justify="center" v-if="this.state.steps.active || false">
+          <v-col align="center">
+            <v-card class="mx-auto" elevation="10">
+              <v-list>
+                <v-list-item-title>
+                  <div class="text-lg-h5">List</div>
+                </v-list-item-title>
+                <v-list-item
+                  v-for="(goal, i) in this.state.steps.values"
+                  :key="i"
+                >
+                  {{ goal }}
+                </v-list-item>
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-col>
+
+    <v-col align-self="end" cols="12" style="height:30%">
+      <v-row justify="space-between" class="d-flex align-self-end">
+        <v-col>
+          <v-btn
+            v-if="this.state.status.value != 'done' || false"
+            outlined
+            width="100%"
+            color="green"
+            class="done mr-2"
+            @click="done()"
+          >
+            <v-icon>done</v-icon> <span>Complete</span>
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-btn
+            width="100%"
+            color="blue"
+            outlined
+            class="mr-2"
+            :to="`${this.id}` + '/edit'"
+          >
+            <v-icon>create</v-icon><span>Edit</span>
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-dialog v-model="dialog" persistent max-width="290">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="red" outlined width="100%" v-bind="attrs" v-on="on">
+                <v-icon>delete</v-icon><span>Delete</span>
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="headline"
+                >Sure delete this goal?</v-card-title
+              >
+              <v-card-text
+                >Remember you can't do recover this goal after your
+                delete!</v-card-text
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="grey darken-1" text @click="dialog = false"
+                  >Cancel</v-btn
+                >
+                <v-btn color="red darken-1" text @click="del()">Delete</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-col>
       </v-row>
-      <v-row justify="center">
-        <div class="text-lg-h3">{{ this.state.title }}</div>
-      </v-row>
-      <v-row justify="center" class="description text-center text-md-body-1">
-        {{ this.state.description }}
-      </v-row>
-      <v-row justify="center" v-if="this.state.steps.active || false">
-        <v-col align="center">
-          <v-card class="mx-auto" elevation="10">
-            <v-list>
-              <v-list-item-title>
-                <div class="text-lg-h5">List</div>
-              </v-list-item-title>
-              <v-list-item
-                v-for="(goal, i) in this.state.steps.values"
-                :key="i"
-              >
-                {{ goal }}
-              </v-list-item>
-            </v-list>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row justify="center">
-        <v-btn
-          v-if="this.state.status.value != 'done' || false"
-          outlined
-          x-large
-          small
-          large
-          color="green"
-          class="done mr-2"
-          @click="done()"
-        >
-          <v-icon>done</v-icon> <span>Complete</span>
-        </v-btn>
-        <v-btn
-          x-large
-          small
-          large
-          color="blue"
-          outlined
-          class="mr-2"
-          :to="`${this.id}` + '/edit'"
-        >
-          <v-icon>create</v-icon><span>Edit</span>
-        </v-btn>
-        <v-dialog v-model="dialog" persistent max-width="290">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="red"
-              outlined
-              x-large
-              small
-              large
-              v-bind="attrs"
-              v-on="on"
-            >
-              <v-icon>delete</v-icon><span>Delete</span>
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="headline">Sure delete this goal?</v-card-title>
-            <v-card-text
-              >Remember you can't do recover this goal after your
-              delete!</v-card-text
-            >
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="grey darken-1" text @click="dialog = false"
-                >Cancel</v-btn
-              >
-              <v-btn color="red darken-1" text @click="del()">Delete</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-row>
-    </div>
-  </v-container>
+    </v-col>
+  </v-card>
 </template>
 
 <script>
-import db from "../store/localdata";
+import { deleteGoal, retriveGoal, updateGoal } from "../store/localdata";
+import moment from "moment";
 // import time from "../time";
 // var countdown = setInterval(counter,1000);
 
@@ -112,9 +116,6 @@ export default {
   mounted() {
     this.overlay = true;
     this.goal();
-  },
-  created() {
-    // this.countdown;
   },
   data() {
     return {
@@ -145,18 +146,20 @@ export default {
   },
 
   methods: {
-    countdown: function() {
+    countdown() {
       this.countId = setInterval(this.counter, 1000);
     },
-    goal: function() {
+    goal() {
       let id = this.id;
-      db.retriveGoal(id)
+      retriveGoal(id)
         .then(data => {
           this.state = Object.assign({}, this.state, data);
           this.overlay = false;
-          let goal = new Date(this.state.datetime).getTime();
-          let now = new Date(Date.now()).getTime();
-          if (goal > now) {
+          // let goal = new Date(this.state.datetime).getTime();
+          let goal = moment(this.state.datetime);
+
+          // let now = new Date(Date.now()).getTime();
+          if (goal.isAfter(moment())) {
             this.countdown();
           }
           console.info(data);
@@ -166,16 +169,17 @@ export default {
         });
     },
 
-    counter: function() {
+    counter() {
       const sec = 1000,
         min = sec * 60,
         hour = min * 60,
         day = hour * 24;
-      let now = Date.now();
-      let goal = this.state.datetime;
+      // let now = Date.now();
+      let { datetime: goal } = this.state;
 
-      let diff = new Date(goal).getTime() - new Date(now).getTime();
+      // let diff = new Date(goal).getTime() - new Date(now).getTime();
       // let time = new Date(counter);
+      let diff = moment(goal).diff(moment());
 
       this.time = diff;
       this.day = Math.floor(diff / day);
@@ -183,40 +187,27 @@ export default {
       this.min = Math.floor((diff % hour) / min);
       this.sec = Math.floor((diff % min) / sec);
     },
-    viewer: function() {
+    viewer() {
       this.view = !this.view;
     },
-    timegoal: function() {
-      let date = new Date(this.state.datetime);
-      let year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      let day = date.getDate();
-      let hour = date.getHours();
-      let min = date.getMinutes();
-      if (min < 10) {
-        min = "0" + min;
-      }
-      if (hour < 10) {
-        hour = "0" + hour;
-      }
-
-      return `${day} / ${month} / ${year} ${hour} : ${min}`;
+    timegoal() {
+      return moment(this.state.datetime).format("DD / MM / YYYY HH:mm");
     },
-    done: function() {
+    done() {
       this.state.status.value = "done";
       this.state.status.date = Date.now();
-      db.updateGoal(this.state, this.id)
+      updateGoal(this.state, this.id)
         .then(data => (this.complete = data))
         .catch(data => (this.complete = data));
     },
-    del: function() {
-      db.deleteGoal(Number(this.id))
+    del() {
+      deleteGoal(Number(this.id))
         .then(data => (this.delete = data))
         .catch(data => (this.delete = data));
     }
   },
   watch: {
-    complete: function(value) {
+    complete(value) {
       if (value && value !== null) {
         this.$router.push({ path: "/" });
         console.log("Complete to goal");
@@ -224,7 +215,7 @@ export default {
         console.log("Failed");
       }
     },
-    delete: function(value) {
+    delete(value) {
       if (value && value !== null) {
         this.$router.push({ path: "/" });
         console.log("Delete goal");
@@ -232,7 +223,7 @@ export default {
         console.log("Failed to Delete goals");
       }
     },
-    time: function(value) {
+    time(value) {
       // let now = new Date (Date.now()).getTime();
       if (value < 999) {
         clearInterval(this.countId);

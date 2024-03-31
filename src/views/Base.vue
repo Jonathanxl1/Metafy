@@ -13,7 +13,6 @@
             <v-icon color="success">add</v-icon>
           </v-btn>
         </v-row>
-
         <v-carousel
           :light="true"
           :hide-delimiter-background="true"
@@ -37,7 +36,7 @@
 <script>
 // @ is an alias to /src
 import viewGoal from "@/components/ViewGoal.vue";
-import db from "../store/localdata";
+import { retriveGoals } from "../store/localdata";
 
 export default {
   name: "Base",
@@ -49,7 +48,7 @@ export default {
     };
   },
   created() {
-    db.retriveGoals()
+    retriveGoals()
       .then(data => {
         this.state = data;
       })
@@ -70,3 +69,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+::v-deep .v-carousel__item {
+  align-items: center;
+}
+</style>

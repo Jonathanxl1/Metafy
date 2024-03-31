@@ -38,6 +38,13 @@
             <!-- <template v-slot:item="{ item }">
               {{ item.text }} 
             </template> -->
+            <template v-slot:selection="{ item }">
+              <span>
+                {{ item.text }}
+
+                <span v-if="state.value !== 4"> ({{ dateByGoal }}) </span>
+              </span>
+            </template>
           </v-select>
           <v-menu
             v-if="state.value == 4"
@@ -159,7 +166,8 @@
 </template>
 
 <script>
-import db from "../store/localdata";
+import { addGoal, retriveConfig } from "../store/localdata";
+import moment from "moment";
 
 export default {
   name: "Add",
@@ -209,26 +217,35 @@ export default {
       options: [
         {
           text: `Short Time`,
-          value: 1
+          value: "short"
         },
         {
           text: "Medium Time",
-          value: 2
+          value: "medium"
         },
         {
           text: "Long Time",
-          value: 3
+          value: "long"
         },
         {
           text: "Personalizado",
           value: 4
         }
-      ]
+      ],
+      times: {},
+      typePeriodObj: {
+        "1": "M",
+        "2": "y"
+      },
+      dateGoal: ""
     };
   },
   mounted() {
     this.state.currentdate = this.currentdate();
     this.form = Object.assign({}, this.state);
+    retriveConfig().then(time => {
+      this.times = Object.assign({}, time);
+    });
   },
   watch: {
     process: function(val) {
@@ -252,8 +269,15 @@ export default {
     // },
     "state.value": function(v) {
       if (v != 4) {
-        this.state.datetime = this.actually();
-      } else {
+        let { period: typePeriod, value } = this.times[v];
+
+        this.dateGoal = this.addDatetime(
+          this.state.currentdate,
+          value,
+          this.typePeriodObj[typePeriod]
+        );
+        this.state.date = this.dateGoal.format("YYYY-MM-DD");
+        this.state.time = this.dateGoal.format("HH:mm");
         this.state.datetime = `${this.state.date} ${this.state.time}`;
       }
     },
@@ -273,9 +297,10 @@ export default {
   },
   methods: {
     addGoal() {
-      db.addGoal(this.state)
+      addGoal(this.state)
         .then(data => {
           this.process = data;
+          this.$router.push({ name: "base" });
         })
         .catch(error => {
           this.process = error;
@@ -346,9 +371,18 @@ export default {
     },
     remove: function(index) {
       this.state.steps.values.splice(index, 1);
-    }
+    },
+    addDatetime: (date, value, time) => {
+      return moment(date).add(value, time);
+    },
+
+    updated() {}
   },
-  updated() {}
+  computed: {
+    dateByGoal() {
+      return this.dateGoal.format("YYYY/MM/DD HH:mm");
+    }
+  }
 };
 </script>
 <style scoped>
