@@ -300,6 +300,7 @@ export default {
       addGoal(this.state)
         .then(data => {
           this.process = data;
+          this.$router.push({ name: "base" });
         })
         .catch(error => {
           this.process = error;
