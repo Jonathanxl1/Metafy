@@ -13,7 +13,6 @@
             <v-icon color="success">add</v-icon>
           </v-btn>
         </v-row>
-
         <v-carousel
           :light="true"
           :hide-delimiter-background="true"
@@ -70,3 +69,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+::v-deep .v-carousel__item {
+  align-items: center;
+}
+</style>
